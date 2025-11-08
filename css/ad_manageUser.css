@@ -1,0 +1,73 @@
+       
+body {
+    font-family: Arial, sans-serif;
+    margin-top: 100px;
+    background-color: #f9f9f9;
+}
+h1 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 20px;
+}
+table {
+    margin-left: auto;
+    margin-right: auto; /* Horizontally centers the table */
+    width: 80%; /* Adjust the width as needed */
+    border-collapse: collapse;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+th, td {
+    padding: 15px;
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+    transition: 0.3s;
+}
+th {
+    background-color: #007bff;
+    color: white;
+}
+tr:hover {
+    background-color: #f1f1f1; 
+}
+.action-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+.btn-update, .btn-delete,.btn-view {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    margin: 4px;
+    border-radius: 5px;
+    text-decoration: none;
+    transition: background-color 0.3s, transform 0.3s;
+    cursor: pointer; 
+}
+.btn-view{
+    background-color: green;
+}
+.btn-delete {
+    background-color: red;
+}
+.btn-update:hover{
+    background-color: #0056b3;
+    transform: translateY(-2px); 
+}
+.btn-delete:hover{
+    background-color: darkred;
+    transform: translateY(-2px); 
+}
+
+@media (max-width: 768px) {
+    body {
+        margin-left: 20px; 
+    }
+    table {
+        width: 100%; 
+    }
+    
+}

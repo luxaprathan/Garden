@@ -1,0 +1,96 @@
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Open Sans', sans-serif;
+    background-color: #edeff0;
+    line-height: 1.6;
+}
+
+
+#showcase {
+    height: 400px;
+    background-size: cover;
+    position: relative;
+}
+
+#showcase .text {
+    background-color: rgba(0, 0, 0, .3);
+    position: absolute;
+    width: 100%;
+    bottom: 100px;
+}
+
+#showcase .text h2 {
+    padding: 20px;
+    text-align: center;
+    color: white;
+}
+
+/**** showcase */
+
+.call-to-action {
+    text-decoration: none;
+    color: white;
+    background-color: #55c18f;
+    display: inline-block;
+    padding: 15px;
+    margin: 15px 0;
+    transition: all 0.4s;
+    border: none;
+}
+
+.call-to-action:hover {
+    background-color: white;
+    color: #55c18f;
+}
+
+#get-in-touch {
+    background-color: #fff;
+    text-align: center;
+}
+
+#get-in-touch h2 {
+    padding: 15px;
+    text-align: center;
+}
+
+#get-in-touch p {
+    font-style: italic;
+    padding: 10px;
+}
+
+#get-in-touch form {
+    padding: 10px;
+    max-width: 500px;
+    margin: auto;
+}
+
+#get-in-touch form input, #get-in-touch form textarea {
+    width: 100%;
+    margin: 5px 0;
+    padding: 10px;
+    border: 1px solid transparent;
+    background-color: #edeff0;
+    outline: none;
+    transition: all 0.4s;
+}
+
+#get-in-touch form input:hover, #get-in-touch form input:focus, 
+#get-in-touch form textarea:hover, #get-in-touch form textarea:focus {
+    background-color: white;
+    border: 1px solid #edeff0;
+}
+
+
+@keyframes moveline{
+    0%{
+        left:-20px;
+    }
+    100%{
+        left:100%;
+    }
+}

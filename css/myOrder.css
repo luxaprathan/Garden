@@ -1,0 +1,75 @@
+/* General Styling */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 20px;
+    margin-bottom: 100px;
+    text-align: center;
+}
+
+/* Heading */
+h2 {
+    color: #333;
+    margin-bottom: 20px;
+}
+
+/* Orders Table */
+.orders-table {
+    width: 90%;
+    max-width: 1000px;
+    margin: 0 auto;
+    border-collapse: collapse;
+    background: white;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.orders-table thead {
+    background: #2c3e50;
+    color: white;
+}
+
+.orders-table th, 
+.orders-table td {
+    padding: 12px;
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+}
+
+.orders-table tr:hover {
+    background: #f5f5f5;
+}
+
+/* Order Image */
+.order-img {
+    width: 60px;
+    height: 60px;
+    border-radius: 5px;
+    object-fit: cover;
+}
+
+/* Empty Orders Message */
+.empty-orders {
+    font-size: 18px;
+    color: #888;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .orders-table {
+        width: 100%;
+        font-size: 14px;
+    }
+
+    .order-img {
+        width: 50px;
+        height: 50px;
+    }
+
+    .orders-table th,
+    .orders-table td {
+        padding: 8px;
+    }
+}

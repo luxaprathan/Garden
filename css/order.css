@@ -1,0 +1,258 @@
+/* General Styling */
+body {
+    font-family: 'Poppins', sans-serif;
+    /* background: linear-gradient(135deg, #e0f7fa, #80deea); */
+    background-color: #f5f5f5;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+    margin-top:100px;
+}
+
+/* Header Title */
+h2 {
+    margin-top: 10px;
+    margin-bottom: 15px;
+    color: #2c3e50;
+    font-size: 25px;
+    text-align:center;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Accordion Container */
+.accordion {
+    width: 80%;
+    max-width: 1000px;
+    margin: 20px auto;
+    background: #ffffff;
+    box-shadow: 8px 8px 16px rgba(0, 0, 0, 0.15), -8px -8px 16px rgba(255, 255, 255, 1);
+    border-radius: 15px;
+    overflow: hidden;
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    position: relative;
+}
+
+.accordion:hover {
+    transform: scale(1.03);
+    box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Order Header (Clickable) */
+/* Order Header (Clickable) */
+.order-header {
+display: grid;
+grid-template-columns: 1fr 2fr 1fr 0.5fr;  /* Create 3 columns with different widths */
+align-items: center;
+padding: 18px 20px;
+background: linear-gradient(to right, #34495e, #2c3e50);
+color: white;
+cursor: pointer;
+font-size: 18px;
+font-weight: 500;
+transition: background 0.3s ease-in-out;
+border-radius: 15px 15px 0 0;
+gap: 20px;  /* Add space between the grid items */
+}
+
+/* Optional: Add space to the button */
+.order-header .toggle-btn {
+justify-self: end; /* Align the button to the right */
+}
+
+/* Order Header elements */
+.order-header div {
+/* No need for margin-right anymore as we are using grid */
+}
+
+
+
+.order-header:hover {
+    background: linear-gradient(to right, #2c3e50, #1a252f);
+}
+
+/* Order Image */
+.order-header img {
+    width: 50px;
+    height: 50px;
+    border-radius: 10px;
+    object-fit: cover;
+    border: 2px solid white;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.order-header img:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+/* Toggle Button */
+.toggle-btn {
+    background: white;
+    border: none;
+    font-size: 30px;
+    cursor: pointer;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    transition: all 0.3s;
+    padding: 0px;
+    padding-bottom: 1px;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.toggle-btn:hover {
+    background: #27ae60;
+    color: white;
+    transform: scale(1.1);
+}.order-products{
+    display: grid;
+    grid-template-columns: 0.8fr 0.8fr 1.5fr 1.2fr;  Create 3 columns with different widths
+    align-items: center;
+    
+}
+
+/* Order Details */
+.order-details {
+    display: none;
+    padding: 20px;
+    background: #f9f9f9;
+    border-top: 1px solid #ddd;
+    text-align: left;
+    animation: slideDown 0.3s ease-in-out;
+    border-radius: 0 0 15px 15px;
+}
+
+/* Order Detail Paragraphs */
+.order-details p {
+    margin: 10px 0;
+    color: #555;
+    font-size: 16px;
+    font-weight: 500;
+    display: flex;
+    /* justify-content: space-between; */
+}
+
+/* Product Image */
+.order-img {
+    width: 100%;
+    height: auto;
+    max-width: 150px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s;
+}
+
+.order-img:hover {
+    transform: scale(1.08);
+}
+
+/* Status Styling */
+.status {
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 14px;
+    display: inline-block;
+    text-transform: uppercase;
+    transition: all 0.3s;
+    letter-spacing: 1px;
+}
+
+/* Status Colors */
+.status.pending {
+    background: linear-gradient(135deg, #f39c12, #e67e22);
+    color: white;
+    box-shadow: 0 4px 8px rgba(243, 156, 18, 0.3);
+}
+
+.status.delivered {
+    background: linear-gradient(135deg, #27ae60, #2ecc71);
+    color: white;
+    box-shadow: 0 4px 8px rgba(39, 174, 96, 0.3);
+}
+
+.status.cancelled {
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+    color: white;
+    box-shadow: 0 4px 8px rgba(231, 76, 60, 0.3);
+}
+.status.ongoing {
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    color: white;
+    box-shadow: 0 4px 8px rgba(52, 152, 219, 0.3);
+}
+
+/* .cancel-btn{ */
+    /* display: none; */
+    /* margin: 0 20% ;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 14px;
+    transition: all 0.3s;
+    background-color:red; */
+/* } */
+.cancel-container {
+display: flex;
+justify-content: center;
+align-items: center;
+margin-top: 10px; /* Adjust spacing as needed */
+}
+
+.cancel-order {
+background-color: #ff4d4d; 
+color: white;
+border: none;
+padding: 10px 15px;
+font-size: 14px;
+font-weight: bold;
+border-radius: 5px;
+cursor: pointer;
+transition: background 0.3s ease;
+}
+
+.cancel-order:hover {
+background-color: #cc0000;
+}
+
+.cancel-order:disabled {
+background-color: #ccc;
+cursor: not-allowed;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .accordion {
+        width: 90%;
+    }
+
+    .order-header {
+        font-size: 16px;
+        padding: 14px;
+    }
+
+    .toggle-btn {
+        font-size: 18px;
+        width: 32px;
+        height: 32px;
+    }
+
+    .order-details p {
+        font-size: 14px;
+    }
+}
+
+/* Animations */
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
