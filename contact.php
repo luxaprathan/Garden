@@ -27,12 +27,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $message_text = trim($_POST['message']);
 
     $phoneError = validatePhone($phone_number);
+    $emailError = validateEmail($email);
     if (!in_array($message_type, ['feedback', 'issue'])) {
         $error = "Please select a valid message type.";
     } elseif (empty($first_name) || empty($email) || empty($message_text)) {
         $error = "All fields are required.";
-    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $error = "Please enter a valid email address.";
+    } elseif ($emailError) {
+        $error = $emailError;
     } elseif ($phoneError) {
         $error = $phoneError;
     } elseif ($message_type === 'feedback') {
@@ -166,7 +167,7 @@ $conn->close();
                     </div>
                     <div class="form-group">
                         <label for="email">Email</label>
-                        <input type="email" id="email" name="email" placeholder="your@email.com" value="<?= htmlspecialchars($defaultEmail) ?>" required>
+                        <input type="email" id="email" name="email" placeholder="your@email.com" data-rule="email" value="<?= htmlspecialchars($defaultEmail) ?>" required>
                     </div>
                     <div class="form-group">
                         <label for="message" id="messageLabel">Your Message</label>

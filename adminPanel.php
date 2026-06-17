@@ -28,9 +28,6 @@ $totalUsers = $conn->query("SELECT COUNT(*) AS c FROM users WHERE id != 1")->fet
 $totalProducts = $conn->query("SELECT COUNT(*) AS c FROM products")->fetch_assoc()['c'];
 $totalFeedback = $conn->query("SELECT COUNT(*) AS c FROM contact_form")->fetch_assoc()['c'];
 $totalIssues = $conn->query("SELECT COUNT(*) AS c FROM issues")->fetch_assoc()['c'];
-
-$mostSoldProducts = $conn->query("SELECT id, name, sold FROM products ORDER BY sold DESC LIMIT 10");
-$lowStockProducts = $conn->query("SELECT id, name, quantity, sold FROM products WHERE quantity - sold <= 50 ORDER BY quantity ASC LIMIT 10");
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -81,63 +78,9 @@ $lowStockProducts = $conn->query("SELECT id, name, quantity, sold FROM products 
         <a href="adminViewIssues.php" class="nav-card">⚠️ Issues</a>
         <a href="adminProfile.php" class="nav-card">👤 My Profile</a>
     </div>
-
-    <!-- Analytics Tabs -->
-    <h3 class="section-label">Analytics</h3>
-    <div class="tab-bar">
-        <button class="tab-btn active" onclick="showTab('revenue', this)">💰 Revenue</button>
-        <button class="tab-btn" onclick="showTab('most-sold', this)">🔥 Most Sold</button>
-        <button class="tab-btn" onclick="showTab('low-stock', this)">⚠️ Low Stock</button>
-    </div>
-
-    <div id="revenue" class="tab-panel active">
-        <?php include "adminRevenue.php"; ?>
-    </div>
-
-    <div id="most-sold" class="tab-panel">
-        <table class="dash-table">
-            <thead><tr><th>ID</th><th>Product</th><th>Sold</th></tr></thead>
-            <tbody>
-                <?php while ($p = $mostSoldProducts->fetch_assoc()): ?>
-                    <tr>
-                        <td><?= (int)$p['id'] ?></td>
-                        <td><?= htmlspecialchars($p['name']) ?></td>
-                        <td><?= (int)$p['sold'] ?></td>
-                    </tr>
-                <?php endwhile; ?>
-            </tbody>
-        </table>
-    </div>
-
-    <div id="low-stock" class="tab-panel">
-        <table class="dash-table">
-            <thead><tr><th>ID</th><th>Product</th><th>Stock Left</th></tr></thead>
-            <tbody>
-                <?php if ($lowStockProducts->num_rows === 0): ?>
-                    <tr><td colspan="3">All products are well stocked.</td></tr>
-                <?php endif; ?>
-                <?php while ($p = $lowStockProducts->fetch_assoc()): ?>
-                    <tr>
-                        <td><?= (int)$p['id'] ?></td>
-                        <td><?= htmlspecialchars($p['name']) ?></td>
-                        <td class="low-stock"><?= (int)$p['quantity'] - (int)$p['sold'] ?></td>
-                    </tr>
-                <?php endwhile; ?>
-            </tbody>
-        </table>
-    </div>
 </div>
 
 <?php include "footer.php"; ?>
 <?php include "dashboard.php"; ?>
-
-<script>
-    function showTab(id, btn) {
-        document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
-        btn.classList.add('active');
-    }
-</script>
 </body>
 </html>
