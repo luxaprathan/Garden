@@ -1,5 +1,9 @@
 <?php
-include "db.php"; // Include database connection
+session_start();
+include "db.php";
+include "functions.php";
+
+requireAdmin();
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $order_id = intval($_POST['order_id']);
@@ -18,5 +22,3 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt->close();
     $conn->close();
 }
-?>
-

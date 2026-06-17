@@ -1,6 +1,9 @@
 <?php
-include "db.php"; // Database connection
 session_start();
+include "db.php";
+include "functions.php";
+
+requireCustomer();
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $order_id = $_POST["order_id"];

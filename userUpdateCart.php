@@ -1,5 +1,9 @@
 <?php
+session_start();
 include 'db.php';
+include 'functions.php';
+
+requireCustomer();
 
 if (isset($_POST['cart_id']) && isset($_POST['quantity'])) {
     $cart_id = $_POST['cart_id'];

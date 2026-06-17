@@ -1,14 +1,11 @@
 <?php
-include 'db.php';
-include 'navbar.php'; 
+session_start();
+include_once 'db.php';
+include_once 'functions.php';
 
-// session_start();
+requireCustomer();
 
-// Check if the user is logged in
-if (!isset($_SESSION["user_id"])) {
-    header("Location: index.php");
-    exit();
-}
+include 'navbar.php';
 
 // Fetch Regular Products
 $sql = "SELECT * FROM products WHERE is_on_sale = 0"; // Regular products
@@ -35,6 +32,7 @@ if ($result_on_sale->num_rows > 0) {
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <title>Home</title>
     <link rel="stylesheet" href="css/style.css">
@@ -42,6 +40,7 @@ if ($result_on_sale->num_rows > 0) {
         .hero-banner {
             background-image: url('img/home.jpg');
         }
+
         #productFilter {
             width: 50%;
             margin-top: 10px;
@@ -51,18 +50,22 @@ if ($result_on_sale->num_rows > 0) {
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             border-radius: 10px;
         }
+
         .modal {
-            display: none; /* Hidden by default */
+            display: none;
+            /* Hidden by default */
             position: fixed;
             z-index: 1000;
             left: 0;
             top: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+            background-color: rgba(0, 0, 0, 0.5);
+            /* Semi-transparent background */
             justify-content: center;
             align-items: center;
         }
+
         .modal-content {
             background: #fff;
             padding: 20px;
@@ -75,101 +78,137 @@ if ($result_on_sale->num_rows > 0) {
 
         /* Fade In Animation */
         @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.9); }
-            to { opacity: 1; transform: scale(1); }
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
         }
 
+        .qty-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .qty-row label {
+            font-size: 14px;
+            color: #555;
+        }
+
+        .qty-row input[type="number"] {
+            width: 60px;
+            padding: 6px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            text-align: center;
+        }
     </style>
 </head>
+
 <body>
 
-<!-- Hero Banner Section -->
-<div class="hero-banner">
-    <div class="hero-content">
-        <p class="subtitle">Welcome To My Garden</p>
-        <h1>New Collection 2024</h1>
-        <a href="#" class="btn">Learn More</a>
+    <!-- Hero Banner Section -->
+    <div class="hero-banner">
+        <div class="hero-content">
+            <p class="subtitle">Welcome To My Garden</p>
+            <h1>New Collection 2024</h1>
+            <a href="#" class="btn">Learn More</a>
+        </div>
     </div>
-</div>
 
-<!-- Tabs Section -->
-<div class="tabs">
-    <span class="active">MOST POPULAR</span> |
-    <span>BEST SELLER</span> |
-    <span>NEW ARRIVAL</span>
-</div>
+    <!-- Tabs Section -->
+    <div class="tabs">
+        <span class="active">MOST POPULAR</span> |
+        <span>BEST SELLER</span> |
+        <span>NEW ARRIVAL</span>
+    </div>
 
-<!-- Search Filter -->
-<input type="text" id="productFilter" placeholder="Search products..." onkeyup="filterProducts()">
+    <!-- Search Filter -->
+    <input type="text" id="productFilter" placeholder="Search products..." onkeyup="filterProducts()">
 
-<!-- Most Popular Product Grid Section -->
-<div class="product-grid" id="productTable">
-    <?php foreach ($products as $product): ?>
-        <div class="product-card">
-            <div class="product-image">
-                <img src="<?php echo $product['image']; ?>" alt="Product Image">
-                <span class="new-label">NEW</span>
+    <!-- Most Popular Product Grid Section -->
+    <div class="product-grid" id="productTable">
+        <?php foreach ($products as $product): ?>
+            <div class="product-card">
+                <div class="product-image">
+                    <img src="<?php echo $product['image']; ?>" alt="Product Image">
+                    <span class="new-label">NEW</span>
+                </div>
+                <div class="product-info">
+                    <h3 class="product-name"><?php echo $product['name']; ?></h3>
+                    <p class="price">
+                        <span class="current-price">$<?php echo number_format($product['current_price'], 2); ?></span>
+                        <span class="original-price">$<?php echo number_format($product['original_price'], 2); ?></span>
+                    </p>
+                    <p class="price">
+                        <span class=""><?php echo number_format($product['sold']); ?> Sold</span>
+                    </p>
+                    <!-- Add to Cart -->
+                    <div class="qty-row">
+                        <label for="qty-<?php echo $product['id']; ?>">Qty:</label>
+                        <input type="number" id="qty-<?php echo $product['id']; ?>" min="1" max="<?php echo max(1, $product['quantity'] - $product['sold']); ?>" value="1">
+                    </div>
+                    <a href="javascript:void(0);" onclick="addToCart(<?php echo $product['id']; ?>)">
+                        <button class="fg">Add to Cart 🛒</button>
+                    </a>
+                </div>
             </div>
-            <div class="product-info">
-                <h3 class="product-name"><?php echo $product['name']; ?></h3>
-                <p class="price">
-                    <span class="current-price">$<?php echo number_format($product['current_price'], 2); ?></span>
-                    <span class="original-price">$<?php echo number_format($product['original_price'], 2); ?></span>
-                </p>
-                <p class="price">
-                    <span class=""><?php echo number_format($product['sold']); ?> Sold</span>
-                </p>
-                <!-- Add to Cart -->
-                <a href="javascript:void(0);" onclick="addToCart(<?php echo $product['id']; ?>)">
-                    <button class="fg">Add to Cart 🛒</button>
-                </a>
-            </div>
-        </div>
-    <?php endforeach; ?>
-</div>
+        <?php endforeach; ?>
+    </div>
 
-<!-- On Sale Products Section -->
-<div class="tabs">
-    <span class="active">ON SALE</span>
-</div>
+    <!-- On Sale Products Section -->
+    <div class="tabs">
+        <span class="active">ON SALE</span>
+    </div>
 
-<!-- On Sale Product Grid -->
-<div class="product-grid" id="productTable">
-    <?php foreach ($on_sale_products as $product): ?>
-        <div class="product-card">
-            <div class="product-image">
-                <img src="<?php echo $product['image']; ?>" alt="Product Image">
-                <span class="sale-label">ON SALE</span>
+    <!-- On Sale Product Grid -->
+    <div class="product-grid" id="productTable">
+        <?php foreach ($on_sale_products as $product): ?>
+            <div class="product-card">
+                <div class="product-image">
+                    <img src="<?php echo $product['image']; ?>" alt="Product Image">
+                    <span class="sale-label">ON SALE</span>
+                </div>
+                <div class="product-info">
+                    <h3 class="product-name"><?php echo $product['name']; ?></h3>
+                    <p class="price">
+                        <span class="current-price">$<?php echo number_format($product['current_price'], 2); ?></span>
+                        <span class="original-price">$<?php echo number_format($product['original_price'], 2); ?></span>
+                    </p>
+                    <p class="price">
+                        <span class=""><?php echo number_format($product['sold']); ?> Sold</span>
+                    </p>
+                    <!-- Add to Cart -->
+                    <div class="qty-row">
+                        <label for="qty-<?php echo $product['id']; ?>">Qty:</label>
+                        <input type="number" id="qty-<?php echo $product['id']; ?>" min="1" max="<?php echo max(1, $product['quantity'] - $product['sold']); ?>" value="1">
+                    </div>
+                    <a href="javascript:void(0);" onclick="addToCart(<?php echo $product['id']; ?>)">
+                        <button class="fg">Add to Cart 🛒</button>
+                    </a>
+                </div>
             </div>
-            <div class="product-info">
-                <h3 class="product-name"><?php echo $product['name']; ?></h3>
-                <p class="price">
-                    <span class="current-price">$<?php echo number_format($product['current_price'], 2); ?></span>
-                    <span class="original-price">$<?php echo number_format($product['original_price'], 2); ?></span>
-                </p>
-                <p class="price">
-                    <span class=""><?php echo number_format($product['sold']); ?> Sold</span>
-                </p>
-                <!-- Add to Cart -->
-                <a href="javascript:void(0);" onclick="addToCart(<?php echo $product['id']; ?>)">
-                    <button class="fg">Add to Cart 🛒</button>
-                </a>
-            </div>
-        </div>
-    <?php endforeach; ?>
-</div>
+        <?php endforeach; ?>
+    </div>
 
-<div id="myModal" class="modal">
+    <div id="myModal" class="modal">
         <div class="modal-content">
             <p id="modalText"></p>
         </div>
-</div>
+    </div>
 
-<?php include 'footer.php'; ?>
-<?php include 'dashboard.php'; ?>
+    <?php include 'footer.php'; ?>
+    <?php include 'dashboard.php'; ?>
 
-<script>
-    function openModal(message) {
+    <script>
+        function openModal(message) {
             let modal = document.getElementById("myModal");
             let modalText = document.getElementById("modalText");
 
@@ -181,37 +220,46 @@ if ($result_on_sale->num_rows > 0) {
                 modal.style.display = "none";
             }, 1000);
         }
-    function filterProducts() {
-        var filter = document.getElementById("productFilter").value.trim().toLowerCase();
-        var grid = document.getElementById("productTable");
-        var cards = grid.getElementsByClassName("product-card");
 
-        for (var i = 0; i < cards.length; i++) {
-            var nameElement = cards[i].getElementsByClassName("product-name")[0];
-            if (nameElement) {
-                var nameText = nameElement.textContent || nameElement.innerText;
-                cards[i].style.display = nameText.toLowerCase().includes(filter) ? "" : "none";
+        function filterProducts() {
+            var filter = document.getElementById("productFilter").value.trim().toLowerCase();
+            var grid = document.getElementById("productTable");
+            var cards = grid.getElementsByClassName("product-card");
+
+            for (var i = 0; i < cards.length; i++) {
+                var nameElement = cards[i].getElementsByClassName("product-name")[0];
+                if (nameElement) {
+                    var nameText = nameElement.textContent || nameElement.innerText;
+                    cards[i].style.display = nameText.toLowerCase().includes(filter) ? "" : "none";
+                }
             }
         }
-    }
 
-    // Add to Cart Function (AJAX)
-    function addToCart(productId) {
-        var xhr = new XMLHttpRequest();
-        xhr.open('GET', 'userAddToCart.php?product_id=' + productId, true);
-        xhr.onreadystatechange = function() {
-            if(xhr.readyState == 4 && xhr.status == 200)
-            {
-                let response = JSON.parse(xhr.responseText);
-                    if (response.success) {
-                        openModal("Product added to cart");
-                    }
+        function addToCart(productId) {
+            var qtyInput = document.getElementById('qty-' + productId);
+            var quantity = qtyInput ? parseInt(qtyInput.value, 10) : 1;
+
+            if (isNaN(quantity) || quantity < 1) {
+                openModal("Please enter a valid quantity (at least 1)");
+                return;
             }
-            
-        };
-        xhr.send();
-    }
-</script>
+
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', 'userAddToCart.php?product_id=' + productId + '&quantity=' + quantity, true);
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState == 4 && xhr.status == 200) {
+                    let response = JSON.parse(xhr.responseText);
+                    if (response.success) {
+                        openModal(quantity + " item(s) added to cart");
+                    } else if (response.error) {
+                        openModal(response.error);
+                    }
+                }
+            };
+            xhr.send();
+        }
+    </script>
 
 </body>
+
 </html>

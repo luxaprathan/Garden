@@ -1,11 +1,11 @@
 <?php
 
+session_start();
 include_once "db.php";
+include_once "functions.php";
 include_once "navbar.php";
-if (!isset($_SESSION['user_id']) ) {
-    header("Location: login.php");
-    exit;
-}
+
+requireAdmin();
 // Check if seeker_id is set
 if (!isset($_GET['id'])) {
     die("User ID not specified.");

@@ -214,7 +214,6 @@ footer .copyright {
                         $links = [
                             "HOME" => "home.php",
                             "ABOUT US" => "about.php",
-                            "SERVICE" => "services.php",
                             "CONTACT" => "contact.php",
                             "PRODUCT" => "#"
                         ];

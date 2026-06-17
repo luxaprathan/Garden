@@ -1,24 +1,82 @@
 <?php
+session_start();
 include 'db.php';
+include 'functions.php';
 
-$success = false; // Initialize success variable
+ensureMessagingSchema($conn);
+
+$success = false;
+$error = "";
+$successType = "";
+
+$defaultName = '';
+$defaultEmail = '';
+if (isset($_SESSION['user_name'])) {
+    $defaultName = $_SESSION['user_name'];
+}
+if (isset($_SESSION['email'])) {
+    $defaultEmail = $_SESSION['email'];
+}
+$userId = isset($_SESSION['user_id']) ? (int)$_SESSION['user_id'] : null;
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Sanitize input data
-    $first_name = mysqli_real_escape_string($conn, $_POST['first_name']);
-    $phone_number = mysqli_real_escape_string($conn, $_POST['phone_number']);
-    $email = mysqli_real_escape_string($conn, $_POST['email']);
-    $message = mysqli_real_escape_string($conn, $_POST['message']);
+    $message_type = $_POST['message_type'] ?? 'feedback';
+    $first_name = trim($_POST['first_name']);
+    $phone_number = preg_replace('/\D/', '', $_POST['phone_number']);
+    $email = trim($_POST['email']);
+    $message_text = trim($_POST['message']);
 
-    // SQL query to insert data into the database
-    $sql = "INSERT INTO contact_form (first_name, phone_number, email, message)
-            VALUES ('$first_name', '$phone_number', '$email', '$message')";
+    $phoneError = validatePhone($phone_number);
+    if (!in_array($message_type, ['feedback', 'issue'])) {
+        $error = "Please select a valid message type.";
+    } elseif (empty($first_name) || empty($email) || empty($message_text)) {
+        $error = "All fields are required.";
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $error = "Please enter a valid email address.";
+    } elseif ($phoneError) {
+        $error = $phoneError;
+    } elseif ($message_type === 'feedback') {
+        if ($userId) {
+            $sql = "INSERT INTO contact_form (first_name, phone_number, email, message, user_id) VALUES (?, ?, ?, ?, ?)";
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("ssssi", $first_name, $phone_number, $email, $message_text, $userId);
+        } else {
+            $sql = "INSERT INTO contact_form (first_name, phone_number, email, message) VALUES (?, ?, ?, ?)";
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("ssss", $first_name, $phone_number, $email, $message_text);
+        }
 
-    if ($conn->query($sql) === TRUE) {
-        $success = true; // Set success to true on successful insertion
+        if ($stmt->execute()) {
+            $success = true;
+            $successType = 'feedback';
+        } else {
+            $error = "Failed to send feedback. Please try again.";
+        }
+        $stmt->close();
     } else {
-        // Show error message if data insertion fails
-        echo "Error: " . $sql . "<br>" . $conn->error;
+        $status = 'pending';
+        if ($userId) {
+            $sql = "INSERT INTO issues (name, email, issue, status, user_id) VALUES (?, ?, ?, ?, ?)";
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("ssssi", $first_name, $email, $message_text, $status, $userId);
+        } else {
+            $sql = "INSERT INTO issues (name, email, issue, status) VALUES (?, ?, ?, ?)";
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("ssss", $first_name, $email, $message_text, $status);
+        }
+
+        if ($stmt->execute()) {
+            $success = true;
+            $successType = 'issue';
+        } else {
+            $error = "Failed to report issue. Please try again.";
+        }
+        $stmt->close();
+    }
+
+    if ($success) {
+        $defaultName = $defaultName ?: '';
+        $defaultEmail = $defaultEmail ?: '';
     }
 }
 
@@ -26,57 +84,124 @@ $conn->close();
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <title>Contact | Garden</title>
-    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300&family=Roboto&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/contact.css">
-    <style>      
-        #showcase {
-            background-image: url('img/contact.jpg');
-        }
-        /* Success message styles */
-        .success-message {
-            background-color: #28a745;
-            color: white;
-            padding: 15px;
-            text-align: center;
-            margin: 20px 0;
-            border-radius: 5px;
-        }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us | My Garden</title>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Roboto:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/pages.css">
 </head>
+
 <body>
-    
+
     <?php include 'navbar.php'; ?>
 
-    <section id="showcase">
-        <div class="text">
-            <h2>Contact Us</h2>
+    <section class="page-hero" style="background-image: url('img/contact.jpg');">
+        <div class="page-hero-overlay">
+            <h1>Contact Us</h1>
+            <p>Send feedback or report an issue — our team will respond soon</p>
         </div>
     </section>
 
-    <section id="get-in-touch">
-        <h2>Get In Touch</h2>
-        <p>We are available 24/7 via e-mail. You can also use the quick contact form to ask questions about our services and projects.</p>
-        
-        <!-- Display success message if the form was submitted successfully -->
-        <?php if ($success): ?>
-            <div class="success-message">
-                <h3>Your message has been sent successfully!</h3>
-                <p>Thank you for contacting us. We will get back to you shortly.</p>
+    <section class="page-section">
+        <div class="page-container contact-layout">
+            <div class="contact-details">
+                <h2>Reach Us</h2>
+                <div class="detail-item">
+                    <strong>Email</strong>
+                    <p>support@mygarden.com</p>
+                </div>
+                <div class="detail-item">
+                    <strong>Phone</strong>
+                    <p>+94 11 234 5678</p>
+                </div>
+                <div class="detail-item">
+                    <strong>Hours</strong>
+                    <p>Mon – Sat: 9:00 AM – 6:00 PM</p>
+                </div>
+                <div class="detail-item">
+                    <strong>Address</strong>
+                    <p>123 Garden Street, Colombo, Sri Lanka</p>
+                </div>
+                <p class="contact-note">
+                    Choose <strong>Feedback</strong> for questions or suggestions (admin → View Feedback).<br>
+                    Choose <strong>Issue</strong> to report a problem (admin → View Issues). Track issue status on your profile page.
+                </p>
             </div>
-        <?php endif; ?>
 
-        <form id="contact-form" method="POST">
-            <input type="text" name="first_name" placeholder="First name" required>
-            <input type="tel" name="phone_number" placeholder="Phone number" required>
-            <input type="email" name="email" placeholder="E-mail" required>
-            <textarea name="message" placeholder="Your message" required></textarea>
-            <button class="call-to-action" type="submit">Send message</button>
-        </form>
+            <div class="contact-form-wrap">
+                <h2 id="formTitle">Send Message</h2>
+
+                <?php if ($success): ?>
+                    <div class="alert alert-success">
+                        <?php if ($successType === 'issue'): ?>
+                            Your issue has been reported. Track its status on your <a href="userProfile.php">profile page</a>.
+                        <?php else: ?>
+                            Thank you! Your feedback has been sent to our admin team.
+                        <?php endif; ?>
+                    </div>
+                <?php endif; ?>
+
+                <?php if ($error): ?>
+                    <div class="alert alert-error"><?= htmlspecialchars($error) ?></div>
+                <?php endif; ?>
+
+                <form method="POST" data-validate class="contact-form" id="contactForm">
+                    <div class="form-group">
+                        <label for="message_type">Type</label>
+                        <select name="message_type" id="message_type" required onchange="updateFormLabels()">
+                            <option value="feedback" <?= (isset($_POST['message_type']) && $_POST['message_type'] === 'feedback') || !isset($_POST['message_type']) ? 'selected' : '' ?>>Feedback</option>
+                            <option value="issue" <?= isset($_POST['message_type']) && $_POST['message_type'] === 'issue' ? 'selected' : '' ?>>Issue</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="first_name">Your Name</label>
+                        <input type="text" id="first_name" name="first_name" placeholder="Full name" value="<?= htmlspecialchars($defaultName) ?>" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone_number">Phone Number</label>
+                        <input type="tel" id="phone_number" name="phone_number" placeholder="10-digit phone number" data-rule="phone" required
+                            value="<?= isset($_POST['phone_number']) ? htmlspecialchars($_POST['phone_number']) : '' ?>">
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" placeholder="your@email.com" value="<?= htmlspecialchars($defaultEmail) ?>" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="message" id="messageLabel">Your Message</label>
+                        <textarea id="message" name="message" rows="5" placeholder="Write your feedback here..." required><?= $success ? '' : (isset($_POST['message']) ? htmlspecialchars($_POST['message']) : '') ?></textarea>
+                    </div>
+                    <button type="submit" class="page-btn full-width" id="submitBtn">Send Feedback</button>
+                </form>
+            </div>
+        </div>
     </section>
 
     <?php include 'footer.php'; ?>
+    <script src="js/validation.js"></script>
+    <script>
+        function updateFormLabels() {
+            var type = document.getElementById('message_type').value;
+            var messageLabel = document.getElementById('messageLabel');
+            var messageField = document.getElementById('message');
+            var submitBtn = document.getElementById('submitBtn');
+            var formTitle = document.getElementById('formTitle');
 
+            if (type === 'issue') {
+                formTitle.textContent = 'Report an Issue';
+                messageLabel.textContent = 'Describe the Issue';
+                messageField.placeholder = 'Describe the problem you encountered...';
+                submitBtn.textContent = 'Report Issue';
+            } else {
+                formTitle.textContent = 'Send Feedback';
+                messageLabel.textContent = 'Your Feedback';
+                messageField.placeholder = 'Write your feedback, question, or suggestion here...';
+                submitBtn.textContent = 'Send Feedback';
+            }
+        }
+        document.addEventListener('DOMContentLoaded', updateFormLabels);
+    </script>
 </body>
+
 </html>

@@ -1,33 +1,25 @@
 <?php
-// Include the database connection file
+session_start();
 include_once "db.php";
+include_once "functions.php";
 include_once "navbar.php";
-if (!isset($_SESSION['user_id']) ) {
-    header("Location: login.php");
-    exit;
-}
 
+requireAdmin();
 
-// Check if a delete request has been made
 if (isset($_GET['delete_id'])) {
-    $deleteID = $_GET['delete_id'];
-    
-    // Prepare and execute the delete query
-    $sqlDelete = "DELETE FROM contact_form WHERE ID = '$deleteID'";
-    if ($conn->query($sqlDelete) === TRUE) {
-        echo "<script>alert('Message deleted successfully!');</script>";
-        // Redirect to refresh the page
-        echo "<script>window.location.href = 'adminViewFeedback.php';</script>";
+    $deleteID = intval($_GET['delete_id']);
+    $stmt = $conn->prepare("DELETE FROM contact_form WHERE id = ?");
+    $stmt->bind_param("i", $deleteID);
+    if ($stmt->execute()) {
+        header("Location: adminViewFeedback.php?deleted=1");
         exit();
-    } else {
-        echo "Error deleting record: " . $conn->error;
     }
+    $stmt->close();
 }
 
-// Fetch messages from the contact table
-$sql = "SELECT * FROM contact_form";
+$sql = "SELECT * FROM contact_form ORDER BY created_at DESC";
 $result = $conn->query($sql);
-
+$feedbackCount = $result ? $result->num_rows : 0;
 ?>
 
 <!DOCTYPE html>
@@ -36,50 +28,80 @@ $result = $conn->query($sql);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>View Feedback</title>
-   <link rel="stylesheet" href="css/ad_viewFeetback.css">
-   <style>
-   </style>
+    <link rel="stylesheet" href="css/ad_viewFeetback.css">
+    <style>
+        body { padding-top: 100px; }
+        .feedback-header {
+            text-align: center;
+            margin: 30px 0 10px;
+        }
+        .feedback-header p {
+            color: #666;
+            margin-top: 8px;
+        }
+        .feedback-count {
+            display: inline-block;
+            background: #3498db;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            margin-left: 8px;
+        }
+        .alert-banner {
+            max-width: 900px;
+            margin: 0 auto 20px;
+            padding: 12px;
+            background: #eafaf1;
+            color: #27ae60;
+            border-radius: 8px;
+            text-align: center;
+        }
+    </style>
 </head>
-<body><h1>View Feedback</h1>
+<body>
+
+<?php if (isset($_GET['deleted'])): ?>
+    <div class="alert-banner">Feedback message deleted successfully.</div>
+<?php endif; ?>
+
+<div class="feedback-header">
+    <h1>Customer Feedback <?= $feedbackCount > 0 ? '<span class="feedback-count">' . $feedbackCount . '</span>' : '' ?></h1>
+    <p>Messages sent from the Contact Us page</p>
+</div>
+
 <table class="feedback">
     <thead>
         <tr>
             <th>Name</th>
             <th>Email</th>
+            <th>Phone</th>
             <th>Message</th>
-            <th>Phone Number</th>
             <th>Date & Time</th>
             <th>Delete</th>
         </tr>
     </thead>
     <tbody>
-        <?php
-        // Check if there are any results
-        if ($result->num_rows > 0) {
-            // Loop through the results and display each row
-            while ($row = $result->fetch_assoc()) {
-                // Determine if the message is from a recruiter or a job seeker
-        ?>
+        <?php if ($result && $result->num_rows > 0): ?>
+            <?php while ($row = $result->fetch_assoc()): ?>
                 <tr>
-                    <td><?php echo $row['first_name'] ?></td>
-                    <td><?php echo $row['email']; ?></td>
-                    <td><?php echo $row['message']; ?></td>
-                    <td><?php echo $row['phone_number']; ?></td>
-                    <td><?php echo $row['created_at']; ?></td>
+                    <td><?= htmlspecialchars($row['first_name']) ?></td>
+                    <td><?= htmlspecialchars($row['email']) ?></td>
+                    <td><?= htmlspecialchars($row['phone_number']) ?></td>
+                    <td><?= htmlspecialchars($row['message']) ?></td>
+                    <td><?= htmlspecialchars($row['created_at']) ?></td>
                     <td>
-                        <a class="delete-btn" href="adminViewFeedback.php?delete_id=<?php echo $row['id']; ?>" onclick="return confirm('Are you sure you want to delete this message?');">Delete</a>
+                        <a class="delete-btn" href="adminViewFeedback.php?delete_id=<?= $row['id'] ?>" onclick="return confirm('Delete this feedback message?');">Delete</a>
                     </td>
                 </tr>
-        <?php
-            }
-        } else {
-            echo "<tr><td colspan='8'>No feedback messages found.</td></tr>";
-        }
-        ?>
+            <?php endwhile; ?>
+        <?php else: ?>
+            <tr><td colspan="6">No feedback messages yet.</td></tr>
+        <?php endif; ?>
     </tbody>
 </table>
+
 <?php include_once "footer.php"; ?>
 <?php include_once "dashboard.php"; ?>
-
 </body>
 </html>

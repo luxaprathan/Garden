@@ -1,7 +1,10 @@
 <?php
+session_start();
 include 'db.php';
+include 'functions.php';
 include 'navbar.php';
-// session_start();
+
+requireCustomer();
 
 $user_id = $_SESSION["user_id"];
 

@@ -105,6 +105,7 @@ CREATE TABLE `contact_form` (
   `phone_number` varchar(15) NOT NULL,
   `email` varchar(100) NOT NULL,
   `message` text NOT NULL,
+  `user_id` int(11) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
@@ -149,6 +150,8 @@ CREATE TABLE `issues` (
   `name` varchar(100) NOT NULL,
   `email` varchar(100) NOT NULL,
   `issue` text NOT NULL,
+  `status` varchar(20) NOT NULL DEFAULT 'pending',
+  `user_id` int(11) DEFAULT NULL,
   `reported_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 

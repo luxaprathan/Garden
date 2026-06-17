@@ -1,5 +1,8 @@
 <?php
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+include_once 'functions.php';
 ?>
 <head>
     <style>
@@ -101,22 +104,25 @@ session_start();
 <body>
     <header>
         <div id="logo">
-                <?php if (isset($_SESSION["user_id"])): ?>
+                <?php if (isset($_SESSION["user_id"]) && !isAdmin()): ?>
                     <a href="home.php">My Garden</a>
+                <?php elseif (isset($_SESSION["user_id"]) && isAdmin()): ?>
+                    <a href="adminPanel.php">My Garden</a>
                 <?php else: ?>
-                    <a href="index.php">My Garden</a>
+                    <a href="login.php">My Garden</a>
                 <?php endif; ?>
             
         </div>
         <nav>
             <ul>
-                <?php if (isset($_SESSION["user_id"])): ?>
-                    <li><li><a href="home.php">Home</a></li></li>
+                <?php if (isset($_SESSION["user_id"]) && !isAdmin()): ?>
+                    <li><a href="home.php">Home</a></li>
+                <?php elseif (isset($_SESSION["user_id"]) && isAdmin()): ?>
+                    <li><a href="adminPanel.php">Dashboard</a></li>
                 <?php else: ?>
-                    <li><li><a href="index.php">Home</a></li></li>
+                    <li><a href="login.php">Login</a></li>
                 <?php endif; ?>
-                <li><a href="About.php">About Us</a></li>
-                <li><a href="services.php">Services</a></li>
+                <li><a href="about.php">About Us</a></li>
                 <li><a href="contact.php">Contact Us</a></li>
                 
                 <?php if (isset($_SESSION["user_id"])): ?>
